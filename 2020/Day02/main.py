@@ -1,43 +1,43 @@
+from re import compile, match
 from collections import namedtuple
-password_policy = namedtuple("password_policy", "min max character password")
+
+pass_policy = namedtuple("pass_policy", "min max character password")
+
 
 def parse_input(input_list):
     result = []
+    pattern = compile(r"([0-9]+)-([0-9]+)\s([a-z]):\s([a-z]+)")
     for line in input_list:
-        character_min = int(line.split('-')[0])
-        character_max = int(line.split('-')[1].split(' ')[0])
-        character = line.split(' ')[1].split(':')[0]
-        password = line.split(':')[1].strip()
-        result.append(password_policy(character_min, character_max, character, password))
+        m = pattern.match(line)
+        policy = pass_policy(int(m.group(1)), int(m.group(2)),
+                             m.group(3), m.group(4))
+        result.append(policy)
     return result
 
 
 def part_one(input_list):
-    password_policies = parse_input(input_list)
     valid_passwords = 0
-    for password_policy in password_policies:
-        character_count = password_policy.password.count(password_policy.character)
-        if character_count >= password_policy.min and character_count <= password_policy.max:
+    for policy in input_list:
+        count = policy.password.count(policy.character)
+        if count >= policy.min and count <= policy.max:
             valid_passwords = valid_passwords + 1
     return valid_passwords
 
+
 def part_two(input_list):
-    password_policies = parse_input(input_list)
     valid_passwords = 0
-    for password_policy in password_policies:
-        password = password_policy.password
-        index1 = password_policy.min - 1
-        index2 = password_policy.max - 1
-        character = password_policy.character
-        if index1 >= len(password) or index2 >= len(password):
-            continue
-        if bool(password[index1] == character) ^ bool(password[index2] == character):
+    for policy in input_list:
+        index1 = policy.min - 1
+        index2 = policy.max - 1
+        password = policy.password
+        character = policy.character
+        if (password[index1] == character) ^ (password[index2] == character):
             valid_passwords = valid_passwords + 1
     return valid_passwords
-    
+
 
 with open("input.txt", "r") as f:
     lines = f.read()
-    lst = lines.split('\n')
+    lst = parse_input(lines.split('\n'))
     print(part_one(lst))
     print(part_two(lst))
