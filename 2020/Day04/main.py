@@ -1,3 +1,6 @@
+from re import match
+
+
 def parse_input(lines):
     passports = [{}]
     passport = {}
@@ -14,13 +17,9 @@ def parse_input(lines):
 
 def part_one(passports):
     valid = []
-    fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+    fields = {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
     for passport in passports:
-        validated_fields = 0
-        for field in fields:
-            if field in passport.keys():
-                validated_fields = validated_fields + 1
-        if validated_fields == len(fields):
+        if fields.intersection(set(passport.keys())) == fields:
             valid.append(passport)
     return valid
 
@@ -29,33 +28,24 @@ def part_two(passports):
     initially_valid_passports = part_one(passports)
     valid = 0
     eye_colors = ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
-    for passport in initially_valid_passports:
-        if not(1920 <= int(passport["byr"]) <= 2002):
+    for psp in initially_valid_passports:
+        if not(1920 <= int(psp["byr"]) <= 2002):
             continue
-        if not(2010 <= int(passport["iyr"]) <= 2020):
+        if not(2010 <= int(psp["iyr"]) <= 2020):
             continue
-        if not(2020 <= int(passport["eyr"]) <= 2030):
+        if not(2020 <= int(psp["eyr"]) <= 2030):
             continue
-        if "cm" not in passport["hgt"] and "in" not in passport["hgt"]:
+        if "cm" not in psp["hgt"] and "in" not in psp["hgt"]:
             continue
-        unit = passport["hgt"][-2:]
-        height = int(passport["hgt"][:-2])
-        if unit == "cm" and not(150 <= height <= 193):
+        if psp["hgt"][-2:] == "cm" and not(150 <= int(psp["hgt"][:-2]) <= 193):
             continue
-        if unit == "in" and not(59 <= height <= 76):
+        if psp["hgt"][-2:] == "in" and not(59 <= int(psp["hgt"][:-2]) <= 76):
             continue
-        if passport["hcl"][0] != '#' or len(passport["hcl"][1:]) != 6:
+        if match("^#[0-9a-f]{6}$", psp["hcl"]) is None:
             continue
-        hcl_valid = True
-        for c in passport["hcl"][1:]:
-            if not(48 <= ord(c) <= 57) and not(97 <= ord(c) <= 122):
-                hcl_valid = False
-                break
-        if not(hcl_valid):
+        if psp["ecl"] not in eye_colors:
             continue
-        if passport["ecl"] not in eye_colors:
-            continue
-        if len(passport["pid"]) != 9 or not(passport["pid"].isdigit()):
+        if len(psp["pid"]) != 9 or not(psp["pid"].isdigit()):
             continue
         valid = valid + 1
     return valid
