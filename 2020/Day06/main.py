@@ -12,19 +12,13 @@ def part_one(lines):
 
 def part_two(lines):
     result = 0
-    answers = set()
-    first = True
+    answers = set("abcdefghijklmnopqrstuvwxyz")
     for line in lines:
         if line == '':
             result = result + len(answers)
-            answers = set()
-            first = True
+            answers = set("abcdefghijklmnopqrstuvwxyz")
             continue
-        if first:
-            answers = set(list(line))
-            first = False
-        else:
-            answers = answers.intersection(set(list(line)))
+        answers = answers.intersection(set(list(line)))
     return result + len(answers)
 
 
