@@ -1,14 +1,14 @@
+import re
+
+
 def parse_rules(lines):
     bag_rules = {}
     for line in lines:
-        bag = line.split("bags")[0].strip()
+        bag = re.search(r"([a-z\s]+)\sbags\scontain\s", line).group(1)
+        rules = re.findall(r"\s([0-9]+)\s([a-z\s]+)\sbag", line)
         contains = {}
-        for b in line.split("contain")[1].replace('.', '').strip().split(','):
-            if b == "no other bags":
-                break
-            num = int(b.strip().split(' ')[0])
-            sub_bag = ' '.join(b.strip().split(' ')[1:-1])
-            contains[sub_bag] = num
+        for rule in rules:
+            contains[rule[1]] = int(rule[0])
         bag_rules[bag] = contains
     return bag_rules
 
