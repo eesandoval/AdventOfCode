@@ -14,14 +14,17 @@ def part_one(lines):
     return bus_id * min_diff
 
 
-def part_two(lines):  # Use wolfram
+def part_two(lines):
+    t = 100000000000000
+    product = 1
     bus_ids = lines[1].split(',')
-    return_str = "0 = "
-    for i, n in enumerate(bus_ids):
-        if n == 'x':
-            continue
-        return_str += "((n + " + str(i) + ") mod " + n + ") = "
-    return return_str[:-2].strip()
+    for i, bus_id in enumerate(bus_ids):
+        if bus_id != 'x':
+            bus_id = int(bus_id)
+            while (t + i) % bus_id != 0:
+                t += product
+            product *= bus_id
+    return t
 
 
 with open("input.txt", "r") as f:
