@@ -4,23 +4,19 @@ def part_one(numbers, turn_length=2020):
     last_spoken = 0
     new_number = True
     for n, number in enumerate(numbers):
-        memory[int(number)] = [n + 1]
+        memory[int(number)] = (n + 1, -1)
         last_spoken = int(number)
     while turn <= turn_length:
         if new_number:
             last_spoken = 0
         else:
-            last_spoken = abs(memory[last_spoken][0] - memory[last_spoken][1])
-        if last_spoken in memory.keys():
-            if len(memory[last_spoken]) < 2:
-                memory[last_spoken].append(turn)
-            else:
-                i = min(memory[last_spoken])
-                memory[last_spoken][memory[last_spoken].index(i)] = turn
+            last_spoken = memory[last_spoken][0] - memory[last_spoken][1]
+        if last_spoken in memory:
+            memory[last_spoken] = (turn, memory[last_spoken][0])
             new_number = False
         else:
             new_number = True
-            memory[last_spoken] = [turn]
+            memory[last_spoken] = (turn, -1)
         turn += 1
     return last_spoken
 
