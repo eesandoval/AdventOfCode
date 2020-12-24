@@ -1,5 +1,4 @@
 from re import findall
-from copy import deepcopy
 
 
 def parse_line(line):
@@ -45,27 +44,36 @@ def part_one(lines):
     return count_black_hexagons(hexagons), hexagons
 
 
+def get_neighbors(hexagon, hexagons):
+    combinations = [(-1, 1), (-1, 0), (0, -1),
+                    (0, 1), (1, 0), (1, -1)]
+    result = 0
+    for c in combinations:
+        adj_hexagon = (hexagon[0] + c[0], hexagon[1] + c[1])
+        if adj_hexagon in hexagons and hexagons[adj_hexagon]:
+            result += 1
+    return result
+
+
 def part_two(lines):
     _, hexagons = part_one(lines)
     combinations = [(-1, 1), (-1, 0), (0, -1),
                     (0, 1), (1, 0), (1, -1)]
-    max_x, max_y, min_x, min_y = get_bounds(hexagons)
-    new_hexagons = deepcopy(hexagons)
     for _ in range(100):
-        for x in range(min_x - 1, max_x + 2):
-            for y in range(min_y - 1, max_y + 2):
-                count = 0
-                hexagon = (x, y)
-                for c in combinations:
-                    adj_hexagon = (hexagon[0] + c[0], hexagon[1] + c[1])
-                    if adj_hexagon in hexagons and hexagons[adj_hexagon]:
-                        count += 1
-                if count == 0 or count > 2:
-                    new_hexagons[hexagon] = False
-                elif count == 2:
-                    new_hexagons[hexagon] = True
-        hexagons = deepcopy(new_hexagons)
-        max_x, max_y, min_x, min_y = get_bounds(hexagons)
+        changes = {}
+        for hexagon in hexagons:
+            count = get_neighbors(hexagon, hexagons)
+            if count == 0 or count > 2:
+                changes[hexagon] = False
+            elif count == 2:
+                changes[hexagon] = True
+            for c in combinations:
+                adj_hexagon = (hexagon[0] + c[0], hexagon[1] + c[1])
+                count = get_neighbors(adj_hexagon, hexagons)
+                if count == 2:
+                    changes[adj_hexagon] = True
+        for hexagon, value in changes.items():
+            hexagons[hexagon] = value
     return count_black_hexagons(hexagons)
 
 
