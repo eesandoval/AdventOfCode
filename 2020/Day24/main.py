@@ -13,20 +13,6 @@ def count_black_hexagons(hexagons):
     return result
 
 
-def get_bounds(hexagons):
-    max_x, max_y, min_x, min_y = 0, 0, 0, 0
-    for hexagon in hexagons:
-        if hexagon[0] > max_x:
-            max_x = hexagon[0]
-        if hexagon[1] > max_y:
-            max_y = hexagon[1]
-        if hexagon[0] < min_x:
-            min_x = hexagon[0]
-        if hexagon[1] < min_y:
-            min_y = hexagon[1]
-    return max_x, max_y, min_x, min_y
-
-
 def part_one(lines):
     hexagons = {(0, 0): False}
     pathing = {"nw": (-1, 1), "w": (-1, 0), "sw": (0, -1),
