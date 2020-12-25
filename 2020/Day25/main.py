@@ -8,7 +8,6 @@ def part_one(card_public, door_public):
         current *= 7
         current %= 20201227
         card_loop += 1
-    print(card_loop)
     card_loop = int(card_loop)
     result = 1
     for _ in range(card_loop):
