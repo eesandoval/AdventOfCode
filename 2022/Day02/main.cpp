@@ -10,14 +10,14 @@ using namespace std;
 
 vector<string> readInputVector(string fileName)
 {
-    ifstream fin(fileName);
-    vector<string> output;
-    string temp;
-    while (getline(fin, temp))
-    {
-        output.push_back(temp);
-    }
-    return output;
+	ifstream fin(fileName);
+	vector<string> output;
+	string temp;
+	while (getline(fin, temp))
+	{
+		output.push_back(temp);
+	}
+	return output;
 }
 
 vector<pair<char, char>> extractPlays(vector<string> guide)
@@ -53,7 +53,7 @@ int partOne(vector<pair<char, char>> plays)
 	{
 		totalScore += cheatGuide[play];
 	}
-    return totalScore;
+	return totalScore;
 }
 
 int partTwo(vector<pair<char, char>> plays)
@@ -73,14 +73,14 @@ int partTwo(vector<pair<char, char>> plays)
 	{
 		totalScore += cheatGuide[play];
 	}
-    return totalScore;
+	return totalScore;
 }
 
 int main(int argc, char* argv[])
 {
-    vector<string> guide = readInputVector(argv[1]);
+	vector<string> guide = readInputVector(argv[1]);
 	vector<pair<char, char>> plays = extractPlays(guide);
-    cout << partOne(plays) << endl;
-    cout << partTwo(plays) << endl;
-    return 0;
+	cout << partOne(plays) << endl;
+	cout << partTwo(plays) << endl;
+	return 0;
 }  
