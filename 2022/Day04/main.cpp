@@ -20,16 +20,8 @@ vector<string> readInputVector(string fileName)
 
 vector<int> parseLine(string line)
 {
-	vector<int> result;
-	size_t commaPos = line.find(",");
-	string string1 = line.substr(0, commaPos);
-	string string2 = line.substr(commaPos + 1, line.length() - commaPos + 1);
-	size_t dashPos1 = string1.find("-");
-	size_t dashPos2 = string2.find("-");
-	result.push_back(stoi(string1.substr(0, dashPos1)));
-	result.push_back(stoi(string1.substr(dashPos1 + 1, string1.length() - dashPos1 + 1)));
-	result.push_back(stoi(string2.substr(0, dashPos2)));
-	result.push_back(stoi(string2.substr(dashPos2 + 1, string2.length() - dashPos2 + 1)));
+	vector<int> result(4, 0);
+	sscanf(line.c_str(), "%d-%d,%d-%d", &result[0], &result[1], &result[2], &result[3]);
 	return result;
 }
 
