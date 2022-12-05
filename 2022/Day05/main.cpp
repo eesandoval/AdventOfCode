@@ -19,16 +19,48 @@ vector<string> readInputVector(string fileName)
 	return output;
 }
 
-vector<stack<char>> parseCrates(vector<string> crateLines)
+vector<stack<char>> parseCrates(vector<string> allLines)
 {
-	vector<stack<char>> result;
-	for (int i = 0; i < crateLines.size(); i++)
+	int totalCrates = (allLines[0].length() / 4) + 1;
+	vector<stringstream> temp(totalCrates);
+	vector<stack<char>> result(totalCrates);
+	for (int i = 0; i < totalCrates; i++)
 	{
-		result.push_back(stack<char>());
-		for (char crate : crateLines[i])
+		temp[i] = stringstream();
+		result[i] = stack<char>();
+	}
+	for (string line : allLines)
+	{
+		if (line[1] == '1')
+			break;
+		int crateNum = -1;
+		for (int i = 1; i < line.length(); i += 4)
 		{
-			result[i].push(crate);
+			crateNum++;
+			if (line[i] == ' ')
+				continue;
+			temp[crateNum] << line[i];
 		}
+	}
+	for (int i = 0; i < totalCrates; i++)
+	{
+		string s = temp[i].str();
+		for (int j = s.length(); j >= 0; j--)
+		{
+			result[i].push(s[j]);
+		}
+	}
+	return result;
+}
+
+vector<string> parseMoves(vector<string> allLines)
+{
+	vector<string> result;
+	for (string line : allLines)
+	{
+		if (line.empty() || line[0] != 'm')
+			continue;
+		result.push_back(line);
 	}
 	return result;
 }
@@ -80,9 +112,9 @@ string partTwo(vector<string> allLines, vector<stack<char>> crates)
 int main(int argc, char* argv[])
 {
 	vector<string> allLines = readInputVector(argv[1]);
-	vector<string> crateLines = readInputVector(argv[2]);
-	vector<stack<char>> crates = parseCrates(crateLines);
-	cout << partOne(allLines, crates) << endl;
-	cout << partTwo(allLines, crates) << endl;
+	vector<stack<char>> crates = parseCrates(allLines);
+	vector<string> allMoves = parseMoves(allLines);
+	cout << partOne(allMoves, crates) << endl;
+	cout << partTwo(allMoves, crates) << endl;
 	return 0;
 }  
