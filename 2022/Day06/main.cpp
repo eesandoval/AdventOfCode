@@ -14,17 +14,6 @@ string readInput(string fileName)
 	return temp;
 }
 
-bool checkSeen(deque <char> seen)
-{
-	set<char> validation;
-	for (char c : seen)
-	{
-		if (!(validation.insert(c).second))
-			return false;
-	}
-	return true;
-}
-
 int getMarker(string buffer, int offset)
 {
 	int result = 0;
@@ -35,7 +24,7 @@ int getMarker(string buffer, int offset)
 	}
 	for (; result < buffer.length(); result++)
 	{
-		if (checkSeen(seen))
+		if (set<char>(seen.begin(), seen.end()).size() == offset)
 			break;
 		seen.pop_back();
 		seen.push_front(buffer[result]);
