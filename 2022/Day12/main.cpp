@@ -5,6 +5,8 @@
 #include <tuple>
 #include <set>
 #include <deque>
+#define StepPoint tuple<int, int, int>
+#define Point tuple<int, int>
 
 using namespace std;
 
@@ -20,7 +22,7 @@ vector<string> readInput(string fileName)
 	return result;
 }
 
-tuple<int, int, int> sPosition(vector<string> allLines)
+StepPoint sPosition(vector<string> allLines)
 {
 	for (int row = 0; row < allLines.size(); row++)
 		for (int col = 0; col < allLines[0].length(); col++)
@@ -29,9 +31,9 @@ tuple<int, int, int> sPosition(vector<string> allLines)
 	return make_tuple(0, 0, 0); // default
 }
 
-deque<tuple<int, int, int>> aPosition(vector<string> allLines)
+deque<StepPoint> aPosition(vector<string> allLines)
 {
-	deque<tuple<int, int, int>> result;
+	deque<StepPoint> result;
 	for (int row = 0; row < allLines.size(); row++)
 		for (int col = 0; col < allLines[0].length(); col++)
 			if (allLines[row][col] == 'a')
@@ -51,81 +53,72 @@ vector<string> updateE(vector<string> allLines)
 	return allLines; // failsafe
 }
 
-vector<tuple<int, int, int>> validPositions(vector<string> allLines, tuple<int, int, int> position)
+vector<StepPoint> validPositions(vector<string> hMap, StepPoint sp)
 {
-	vector<tuple<int, int, int>> result;
-	int row = get<0>(position), col = get<1>(position), steps = get<2>(position);
-	char currElevation = allLines[row][col];
-	if (currElevation == 'S')
-		currElevation = 'a';
+	vector<StepPoint> result;
+	int row = get<0>(sp), col = get<1>(sp), steps = get<2>(sp);
+	char height = hMap[row][col];
+	if (height == 'S')
+		height = 'a';
 
-	if (row - 1 >= 0 && allLines[row - 1][col] - currElevation <= 1)
-		result.push_back(make_tuple(row - 1, col, steps+1));
-	if (row + 1 <= allLines.size() - 1 && allLines[row + 1][col] - currElevation <= 1)
-		result.push_back(make_tuple(row + 1, col, steps+1));
-	if (col - 1 >= 0 && allLines[row][col - 1] - currElevation <= 1)
-		result.push_back(make_tuple(row, col - 1, steps+1));
-	if (col + 1 <= allLines[0].length() - 1 && allLines[row][col + 1] - currElevation <= 1)
-		result.push_back(make_tuple(row, col + 1, steps+1));
+	if (row - 1 >= 0 && hMap[row - 1][col] - height <= 1)
+		result.push_back(make_tuple(row - 1, col, steps + 1));
+
+	if (row + 1 <= hMap.size() - 1 && hMap[row + 1][col] - height <= 1)
+		result.push_back(make_tuple(row + 1, col, steps + 1));
+
+	if (col - 1 >= 0 && hMap[row][col - 1] - height <= 1)
+		result.push_back(make_tuple(row, col - 1, steps + 1));
+
+	if (col + 1 <= hMap[0].length() - 1 && hMap[row][col + 1] - height <= 1)
+		result.push_back(make_tuple(row, col + 1, steps + 1));
+
 	return result;
 }
 
-int partOne(vector<string> originalLines)
+int BFS(vector<string> hMap, vector<string> hMapE, deque<StepPoint> dsp)
 {
-	auto startPosition = sPosition(originalLines);
-	vector<string> allLines = updateE(originalLines);
-	set<tuple<int, int>> seen;
-	deque<tuple<int, int, int>> nextPositions; 
-	nextPositions.push_back(startPosition);
-	
-	while (nextPositions.size() > 0)
+	set<Point> seen;
+	while (dsp.size() > 0)
 	{
-		auto nextPosition = nextPositions.front();
-		nextPositions.pop_front();
-		auto checkPosition = make_tuple(get<0>(nextPosition), get<1>(nextPosition));		
+		auto pos = dsp.front();
+		dsp.pop_front();
+		auto checkPos = make_tuple(get<0>(pos), get<1>(pos));		
 
-		if (seen.find(checkPosition) != seen.end()) // skip seen positions
+		if (seen.find(checkPos) != seen.end()) // skip seen positions
 			continue; 
-		seen.insert(checkPosition);
-		
-		if (originalLines[get<0>(nextPosition)][get<1>(nextPosition)] == 'E')
-			return get<2>(nextPosition); // return steps
-		auto newPositions = validPositions(allLines, nextPosition);
+		seen.insert(checkPos);
+	
+		if (hMapE[get<0>(pos)][get<1>(pos)] == 'E')
+			return get<2>(pos); // return steps
+		auto newPositions = validPositions(hMap, pos);
 		for (auto newPosition : newPositions)
-			nextPositions.push_back(newPosition);
+			dsp.push_back(newPosition);
 	}
 	return -1; // Should never hit this 
 }
 
-int partTwo(vector<string> originalLines)
+int partOne(vector<string> hMap, vector<string> hMapE)
 {
-	vector<string> allLines = updateE(originalLines);
-	set<tuple<int, int>> seen;
-	deque<tuple<int, int, int>> nextPositions = aPosition(originalLines);
-	
-	while (nextPositions.size() > 0)
-	{
-		auto nextPosition = nextPositions.front();
-		nextPositions.pop_front();
-		auto checkPosition = make_tuple(get<0>(nextPosition), get<1>(nextPosition));		
+	auto startPosition = sPosition(hMap);
+	deque<StepPoint> positions;
+	positions.push_back(startPosition);
 
-		if (seen.find(checkPosition) != seen.end()) // skip seen positions
-			continue; 
-		seen.insert(checkPosition);
+	return BFS(hMap, hMapE, positions);
+}
+
+int partTwo(vector<string> hMap, vector<string> hMapE)
+{
+	auto positions = aPosition(hMap);
 	
-		if (originalLines[get<0>(nextPosition)][get<1>(nextPosition)] == 'E')
-			return get<2>(nextPosition); // return steps
-		auto newPositions = validPositions(allLines, nextPosition);
-		for (auto newPosition : newPositions)
-			nextPositions.push_back(newPosition);
-	}
-	return -1; // Should never hit this 
+	return BFS(hMap, hMapE, positions);
 }
 
 int main(int argc, char* argv[])
 {
-	vector<string> allLines = readInput(argv[1]);
-	cout << partOne(allLines) << endl;
-	cout << partTwo(allLines) << endl;
+	vector<string> hMapE = readInput(argv[1]);
+	vector<string> hMap = updateE(hMapE);
+	cout << partOne(hMap, hMapE) << endl;
+	cout << partTwo(hMap, hMapE) << endl;
 	return 0;
 }  
