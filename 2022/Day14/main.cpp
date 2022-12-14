@@ -2,7 +2,6 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <tuple>
 
 using namespace std;
 
@@ -24,22 +23,12 @@ void createLine(int x1, int x2, int y1, int y2)
 {
 	rMaxY = max(rMaxY, y1);
 	if (x2 != -1 && y2 != -1) // after first token
-	{
 		if (x1 == x2) // same column
-		{
 			for (int i = min(y1, y2); i <= max(y1, y2); i++)
-			{
 				cave[i][x1] = '#';
-			}
-		}
 		else if (y1 == y2) // same row
-		{
 			for (int i = min(x1, x2); i <= max(x1, x2); i++)
-			{
 				cave[y1][i] = '#';
-			}
-		}
-	}
 }
 
 void setupCave(vector<string> allLines)
@@ -66,15 +55,13 @@ void setupCave(vector<string> allLines)
 	cave[startY][startX] = '+';
 }
 
-int partOne(vector<string> allLines)
+int placeSand()
 {
-	setupCave(allLines);
-	int result = 0;
+	int result = 0, sandX, sandY;
 	while (true)
 	{
-		int sandX = startX, sandY = startY + 1;
-		while (cave[sandY][sandX] == '.' && sandY <= rMaxY)
-		{
+		sandX = startX, sandY = startY;
+		while (sandY <= rMaxY)
 			if (cave[sandY + 1][sandX] == '.')
 				sandY++;
 			else if (cave[sandY + 1][sandX - 1] == '.')
@@ -83,42 +70,27 @@ int partOne(vector<string> allLines)
 				sandY++, sandX++;
 			else
 				break;
-		}
-		if (sandY > rMaxY) 
-			break;
+		if (sandY > rMaxY || (sandY == startY && sandX == startX))
+			break; // exit if we are going into the void or can't place sand
 		cave[sandY][sandX] = 'o';
 		result++;
 	}
 	return result;
 }
 
+int partOne(vector<string> allLines)
+{
+	setupCave(allLines);
+	return placeSand();
+}
+
 int partTwo(vector<string> allLines)
 {
 	setupCave(allLines);
-	int result = 0;
 	rMaxY += 2;
 	for (int x = 0; x <= maxX; x++) // floor
 		cave[rMaxY][x] = '#';
-	while (true)
-	{
-		int sandX = startX, sandY = startY;
-		while (sandY <= rMaxY)
-		{
-			if (cave[sandY + 1][sandX] == '.')
-				sandY++;
-			else if (cave[sandY + 1][sandX - 1] == '.')
-				sandY++, sandX--;
-			else if (cave[sandY + 1][sandX + 1] == '.')
-				sandY++, sandX++;
-			else
-				break;
-		}
-		if (sandY == startY && sandX == startX)
-			break;
-		cave[sandY][sandX] = 'o';
-		result++;
-	}
-	return result + 1;
+	return placeSand() + 1;
 }
 
 int main(int argc, char* argv[])
