@@ -130,17 +130,17 @@ int64_t partOne(vector<string> allLines)
 // This basically guarantees my code only works for my input ... 
 int determineGrid(int ccol, int crow)
 {
-	if (50 <= ccol <= 99 && 0 <= crow <= 49)
+	if (ccol >= 50 && ccol <= 99 && crow >= 0 && crow <= 49)
 		return 0;
-	if (100 <= ccol <= 149 && 0 <= crow <= 49)
+	if (ccol >= 100 && ccol <= 149 && crow >= 0 && crow <= 49)
 		return 1;
-	if (50 <= ccol <= 99 && 50 <= crow <= 99)
+	if (ccol >= 50 && ccol <= 99 && crow >= 50 && crow <= 99)
 		return 2;
-	if (0 <= ccol <= 49 && 100 <= crow <= 149)
+	if (ccol >= 0 && ccol <= 49 && crow >= 100 && crow <= 149)
 		return 3;
-	if (50 <= ccol <= 99 && 100 <= crow <= 149)
+	if (ccol >= 50 && ccol <= 99 && crow >= 100 && crow <= 149)
 		return 4;
-	if (0 <= ccol <= 49 && 150 <= crow <= 199)
+	if (ccol >= 0 && ccol <= 49 && crow >= 150 && crow <= 199)
 		return 5;
 	return -1; // we fell off the cube
 }
@@ -150,8 +150,6 @@ bool translateGrids(int cGrid, int nGrid, int& ccol, int& crow, vector<string> a
 	int oldccol = ccol, oldcrow = crow;
 	if (cGrid == 0 && nGrid == 3) // F
 	{
-//		ccol = 49 - oldcrow;
-//		crow = 49 + oldccol;
 		crow = 149 - crow;
 		ccol = 0;
 	}
@@ -410,7 +408,41 @@ void moveOnCube(vector<string> allLines, int& ccol, int& crow, int& cdir, int ne
 }
 uint64_t partTwo(vector<string> allLines)
 {
-	return 0;
+	string p = allLines.back(), temp;
+	allLines.erase(allLines.end() - 2, allLines.end());
+	int crow = -1, ccol = -1, cdir = 0;
+	for (int row = 0; row < allLines.size(); row++)
+	{
+		for (int col = 0; col < allLines[row].length(); col++)
+		{
+			if (allLines[row][col] == '.')
+			{
+				crow = row, ccol = col;
+				break;
+			}
+		}
+		if (crow != -1 && ccol != -1)
+			break;
+	}
+	
+	stringstream tempNum;
+	int nextMove = -1;
+	char nextDir = ' ';
+	for (int i = 0; i < p.length(); i++)
+	{
+		if (isdigit(p[i]))
+		{
+			tempNum << p[i];
+			continue;
+		}
+		nextMove = stoi(tempNum.str());
+		tempNum.str(string());
+		nextDir = p[i];
+		moveOnCube(allLines, ccol, crow, cdir, nextMove, nextDir);
+	}
+	nextMove = stoi(tempNum.str());
+	moveOnCube(allLines, ccol, crow, cdir, nextMove, ' ');
+	return 1000 * (crow + 1) + 4 * (ccol + 1) + cdir;
 }
 
 int main(int argc, char* argv[])
