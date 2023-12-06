@@ -4,16 +4,9 @@ var numbers = new Regex(@"(\d+)", RegexOptions.Compiled);
 
 int getNumberOfWins(long time, long distance)
 {
-    var result = 0;
     var hold = 1; // holding for 0 makes no sense
-    while (hold++ < time) // holding for full makes no sense
-    {
-        if ((time - hold) * hold > distance)
-        {
-            result++;
-        }
-    }
-    return result;
+    while ((time - hold) * hold++ <= distance);
+    return (int)(time + 1 - (hold - 1) * 2); // symmetrical, remove sides
 }
 
 int partOne(string[] allLines)
